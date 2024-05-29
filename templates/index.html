@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forget Me Not</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="number-display">
+        <img src="{{ url_for('static', filename='images/template.png') }}" alt="Module" id="module-image">
+        <div id="overlay">
+            <div id="stage-display" class="display">
+                <img id="stage-digit1" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}">
+                <img id="stage-digit2" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}">
+            </div>
+            <div id="main-display" class="display">
+                <img id="main-digit1" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}" style="display: none;">
+                <img id="main-digit2" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}" style="display: none;">
+                <img id="main-digit3" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}">
+            </div>
+            <!-- Add button overlays -->
+            <div id="keypad">
+                <button class="button" data-value="1" style="top: 20%; left: 22%;"></button>
+                <button class="button" data-value="2" style="top: 20%; left: 48%;"></button>
+                <button class="button" data-value="3" style="top: 20%; left: 74%;"></button>
+                <button class="button" data-value="4" style="top: 40%; left: 22%;"></button>
+                <button class="button" data-value="5" style="top: 40%; left: 48%;"></button>
+                <button class="button" data-value="6" style="top: 40%; left: 74%;"></button>
+                <button class="button" data-value="7" style="top: 60%; left: 22%;"></button>
+                <button class="button" data-value="8" style="top: 60%; left: 48%;"></button>
+                <button class="button" data-value="9" style="top: 60%; left: 74%;"></button>
+                <button class="button" data-value="0" style="top: 80%; left: 48%;"></button>
+            </div>
+        </div>
+    </div>
+    <div id="input-section">
+        <div id="submission-display" class="display">
+            <div id="submission-dashes">
+                <!-- Initial dash placeholders -->
+                <div class="submission-line">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                </div>
+                <div class="submission-line">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
+                </div>
+            </div>
+        </div>
+        <form id="number-form" style="display: none;">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let numbers = [];
+            let currentIndex = 0;
+            let submissionInput = [];
+
+            const digitSrcs = {
+                '0': "{{ url_for('static', filename='images/0_new.png') }}",
+                '1': "{{ url_for('static', filename='images/1_new.png') }}",
+                '2': "{{ url_for('static', filename='images/2_new.png') }}",
+                '3': "{{ url_for('static', filename='images/3_new.png') }}",
+                '4': "{{ url_for('static', filename='images/4_new.png') }}",
+                '5': "{{ url_for('static', filename='images/5_new.png') }}",
+                '6': "{{ url_for('static', filename='images/6_new.png') }}",
+                '7': "{{ url_for('static', filename='images/7_new.png') }}",
+                '8': "{{ url_for('static', filename='images/8_new.png') }}",
+                '9': "{{ url_for('static', filename='images/9_new.png') }}",
+                '-': "{{ url_for('static', filename='images/dash.png') }}"
+            };
+
+            function displayNumber() {
+                if (currentIndex < numbers.length) {
+                    let stageNumber = (currentIndex + 1) % 100;
+                    stageNumber = stageNumber < 10 ? '0' + stageNumber : stageNumber.toString();
+                    let mainNumber = numbers[currentIndex].toString();
+
+                    $('#stage-digit1').attr('src', digitSrcs[stageNumber[0]]);
+                    $('#stage-digit2').attr('src', digitSrcs[stageNumber[1]]);
+
+                    if (mainNumber.length === 1) {
+                        $('#main-digit1').hide();
+                        $('#main-digit2').hide();
+                        $('#main-digit3').attr('src', digitSrcs[mainNumber]);
+                    } else if (mainNumber.length === 2) {
+                        $('#main-digit1').hide();
+                        $('#main-digit2').attr('src', digitSrcs[mainNumber[0]]).show();
+                        $('#main-digit3').attr('src', digitSrcs[mainNumber[1]]);
+                    } else {
+                        $('#main-digit1').attr('src', digitSrcs[mainNumber[0]]).show();
+                        $('#main-digit2').attr('src', digitSrcs[mainNumber[1]]).show();
+                        $('#main-digit3').attr('src', digitSrcs[mainNumber[2]]);
+                    }
+
+                    currentIndex++;
+                    setTimeout(displayNumber, 10);
+                } else {
+                    $('#number-display').show();
+                    $('#keypad').show();
+                    prepareSubmission();
+                }
+            }
+
+            function prepareSubmission() {
+                $('#stage-display').html('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}"><img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                $('#main-display').html('<div id="submission-dashes"></div>');
+                $('#submission-dashes').html('');
+                for (let i = 0; i < 2; i++) {
+                    let line = $('<div class="submission-line"></div>');
+                    for (let j = 0; j < 12; j++) {
+                        line.append('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                    }
+                    $('#submission-dashes').append(line);
+                }
+                $('#input-section').show();
+            }
+
+            function updateSubmissionDisplay() {
+                $('#submission-dashes').empty();
+                let currentLine = $('<div class="submission-line"></div>');
+                let lineCount = 0;
+                submissionInput.forEach((num, index) => {
+                    currentLine.append('<img class="digit" src="' + digitSrcs[num] + '">');
+                    if ((index + 1) % 12 === 0) {
+                        $('#submission-dashes').append(currentLine);
+                        currentLine = $('<div class="submission-line"></div>');
+                        lineCount++;
+                    }
+                });
+                $('#submission-dashes').append(currentLine);
+                let remainingDashes = 12 - (submissionInput.length % 12);
+                for (let i = 0; i < remainingDashes; i++) {
+                    currentLine.append('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                }
+                if (lineCount > 1) {
+                    $('#submission-dashes').children().slice(0, -2).remove();
+                }
+            }
+
+            $('.button').on('click', function() {
+                let value = $(this).data('value');
+                if (submissionInput.length < 100) {
+                    submissionInput.push(value);
+                    updateSubmissionDisplay();
+                }
+            });
+
+            $('#number-form').submit(function(event) {
+                event.preventDefault();
+                $.post('/submit_numbers', {numbers: submissionInput}, function(response) {
+                    console.log(response.user_numbers);
+                });
+            });
+
+            $.getJSON('/generate_numbers', function(data) {
+                numbers = data.numbers;
+                displayNumber();
+            });
+        });
+    </script>
+</body>
+</html>

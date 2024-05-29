@@ -1,0 +1,89 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #000;
+    margin: 0;
+}
+
+#number-display {
+    position: relative;
+}
+
+#module-image {
+    width: 539px; /* Width of the image */
+    height: 519px; /* Height of the image */
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Ensure mouse clicks pass through to the form */
+}
+
+.display {
+    position: absolute;
+}
+
+#stage-display {
+    top: 37%;
+    left: 78%;
+    transform: translate(-50%, -50%);
+    display: flex;
+}
+
+#main-display {
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+}
+
+.digit {
+    width: 32px; /* Adjust size as necessary */
+    height: 50px; /* Adjust size as necessary */
+}
+
+.dash {
+    width: 32px; /* Adjust size as necessary */
+    height: 50px; /* Adjust size as necessary */
+}
+
+#submission-display {
+    position: absolute;
+    top: 52%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.submission-line {
+    display: flex;
+}
+
+#input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.button {
+    position: absolute;
+    width: 12%; /* Adjust size as necessary */
+    height: 12%; /* Adjust size as necessary */
+    pointer-events: auto;
+    background: transparent;
+    border: none;
+}
+
+input[type="submit"] {
+    font-size: 1.5em;
+}

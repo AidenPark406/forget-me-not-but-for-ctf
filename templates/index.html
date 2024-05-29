@@ -8,6 +8,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div id="flag-message" style="text-align: center; margin-bottom: 20px; color: white; font-size: 1.5em;">
+            {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
     <div id="number-display">
         <img src="{{ url_for('static', filename='images/template.png') }}" alt="Module" id="module-image">
         <div id="overlay">
@@ -21,52 +28,25 @@
                 <img id="main-digit3" class="digit" src="{{ url_for('static', filename='images/0_new.png') }}">
             </div>
             <!-- Add button overlays -->
-            <div id="keypad">
-                <button class="button" data-value="1" style="top: 20%; left: 22%;"></button>
-                <button class="button" data-value="2" style="top: 20%; left: 48%;"></button>
-                <button class="button" data-value="3" style="top: 20%; left: 74%;"></button>
-                <button class="button" data-value="4" style="top: 40%; left: 22%;"></button>
-                <button class="button" data-value="5" style="top: 40%; left: 48%;"></button>
-                <button class="button" data-value="6" style="top: 40%; left: 74%;"></button>
-                <button class="button" data-value="7" style="top: 60%; left: 22%;"></button>
-                <button class="button" data-value="8" style="top: 60%; left: 48%;"></button>
-                <button class="button" data-value="9" style="top: 60%; left: 74%;"></button>
-                <button class="button" data-value="0" style="top: 80%; left: 48%;"></button>
+            <div id="keypad" style="pointer-events: none;">
+                <button class="button" data-value="1" style="top: 11%; left: 11%;"></button>
+                <button class="button" data-value="2" style="top: 11%; left: 31%;"></button>
+                <button class="button" data-value="3" style="top: 11%; left: 50%;"></button>
+                <button class="button" data-value="4" style="top: 30%; left: 11%;"></button>
+                <button class="button" data-value="5" style="top: 30%; left: 31%;"></button>
+                <button class="button" data-value="6" style="top: 30%; left: 50%;"></button>
+                <button class="button" data-value="7" style="top: 49%; left: 11%;"></button>
+                <button class="button" data-value="8" style="top: 49%; left: 31%;"></button>
+                <button class="button" data-value="9" style="top: 49%; left: 50%;"></button>
+                <button class="button" data-value="0" style="top: 49%; left: 70%;"></button>
             </div>
         </div>
     </div>
-    <div id="input-section">
+    <div id="input-section" style="display: none;">
         <div id="submission-display" class="display">
             <div id="submission-dashes">
-                <!-- Initial dash placeholders -->
-                <div class="submission-line">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                </div>
-                <div class="submission-line">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                    <img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">
-                </div>
+                <!-- Initial dash placeholders (96 dashes) -->
+                <!-- Line placeholders will be created dynamically -->
             </div>
         </div>
         <form id="number-form" style="display: none;">
@@ -79,6 +59,8 @@
             let numbers = [];
             let currentIndex = 0;
             let submissionInput = [];
+            let maxDashes = 96;
+            let correctPresses = 0;
 
             const digitSrcs = {
                 '0': "{{ url_for('static', filename='images/0_new.png') }}",
@@ -120,8 +102,7 @@
                     currentIndex++;
                     setTimeout(displayNumber, 10);
                 } else {
-                    $('#number-display').show();
-                    $('#keypad').show();
+                    $('#keypad').css('pointer-events', 'auto');
                     prepareSubmission();
                 }
             }
@@ -130,10 +111,13 @@
                 $('#stage-display').html('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}"><img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
                 $('#main-display').html('<div id="submission-dashes"></div>');
                 $('#submission-dashes').html('');
-                for (let i = 0; i < 2; i++) {
+                for (let i = 0; i < 8; i++) {
                     let line = $('<div class="submission-line"></div>');
                     for (let j = 0; j < 12; j++) {
                         line.append('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                        if ((j + 1) % 3 === 0 && j !== 11) {
+                            line.append('<span class="gap"></span>');
+                        }
                     }
                     $('#submission-dashes').append(line);
                 }
@@ -141,39 +125,64 @@
             }
 
             function updateSubmissionDisplay() {
+                let totalDashes = submissionInput.length;
+                let linesToShow = Math.ceil(totalDashes / 12);
+                let lastLineExtraDashes = (totalDashes % 12) || 12;
+
                 $('#submission-dashes').empty();
-                let currentLine = $('<div class="submission-line"></div>');
-                let lineCount = 0;
-                submissionInput.forEach((num, index) => {
-                    currentLine.append('<img class="digit" src="' + digitSrcs[num] + '">');
-                    if ((index + 1) % 12 === 0) {
-                        $('#submission-dashes').append(currentLine);
-                        currentLine = $('<div class="submission-line"></div>');
-                        lineCount++;
+
+                for (let i = Math.max(0, linesToShow - 2); i < linesToShow; i++) {
+                    let line = $('<div class="submission-line"></div>');
+                    for (let j = 0; j < 12; j++) {
+                        let index = i * 12 + j;
+                        if (index < totalDashes) {
+                            line.append('<img class="digit" src="' + digitSrcs[submissionInput[index]] + '">');
+                        } else {
+                            line.append('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                        }
+                        if ((j + 1) % 3 === 0 && j !== 11) {
+                            line.append('<span class="gap"></span>');
+                        }
                     }
-                });
-                $('#submission-dashes').append(currentLine);
-                let remainingDashes = 12 - (submissionInput.length % 12);
-                for (let i = 0; i < remainingDashes; i++) {
-                    currentLine.append('<img class="dash" src="{{ url_for('static', filename='images/dash.png') }}">');
+                    $('#submission-dashes').append(line);
                 }
-                if (lineCount > 1) {
-                    $('#submission-dashes').children().slice(0, -2).remove();
-                }
+            }
+
+            function updateStageCounter() {
+                correctPresses++;
+                let stageNumber = (correctPresses % 100).toString().padStart(2, '0');
+                $('#stage-digit1').attr('src', digitSrcs[stageNumber[0]]);
+                $('#stage-digit2').attr('src', digitSrcs[stageNumber[1]]);
             }
 
             $('.button').on('click', function() {
                 let value = $(this).data('value');
-                if (submissionInput.length < 100) {
-                    submissionInput.push(value);
-                    updateSubmissionDisplay();
-                }
+                let currentStage = correctPresses;
+
+                $.post('/submit_number', { number: value, stage: currentStage }, function(response) {
+                    if (response.success) {
+                        if (submissionInput.length < maxDashes) {
+                            submissionInput.push(value);
+                            updateSubmissionDisplay();
+                            updateStageCounter();
+
+                            if (submissionInput.length == maxDashes) {
+                                $('#number-form').submit();
+                            }
+                        }
+                    } else {
+                        location.reload();
+                    }
+                });
             });
 
             $('#number-form').submit(function(event) {
                 event.preventDefault();
                 $.post('/submit_numbers', {numbers: submissionInput}, function(response) {
                     console.log(response.user_numbers);
+                    if (response.user_numbers.length == maxDashes) {
+                        location.reload();  // Reload to display the flag message
+                    }
                 });
             });
 

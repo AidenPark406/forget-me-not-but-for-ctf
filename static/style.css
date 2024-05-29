@@ -49,6 +49,11 @@ body {
     height: 50px; /* Adjust size as necessary */
 }
 
+.digit.small {
+    width: 32px; /* Adjust size as necessary */
+    height: 50px; /* Adjust size as necessary */
+}
+
 .dash {
     width: 32px; /* Adjust size as necessary */
     height: 50px; /* Adjust size as necessary */
@@ -56,8 +61,8 @@ body {
 
 #submission-display {
     position: absolute;
-    top: 52%;
-    left: 55%;
+    top: 70%;
+    left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
@@ -66,6 +71,12 @@ body {
 
 .submission-line {
     display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.gap {
+    width: 10px; /* Adjust gap size as necessary */
 }
 
 #input-section {
@@ -77,8 +88,8 @@ body {
 
 .button {
     position: absolute;
-    width: 12%; /* Adjust size as necessary */
-    height: 12%; /* Adjust size as necessary */
+    width: 80px; /* Adjust size as necessary */
+    height: 80px; /* Adjust size as necessary */
     pointer-events: auto;
     background: transparent;
     border: none;
